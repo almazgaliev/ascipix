@@ -8,7 +8,18 @@ fn main() {
     let matches = Command::new("ascipix")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Galiev A. <almazgaliev99@gmail.com>")
-        .about("converts image into ascii art")
+        .about(r"
+                                                              
+      _/_/                        _/            _/            
+   _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/   
+  _/_/_/_/  _/_/      _/        _/  _/    _/  _/    _/_/      
+ _/    _/      _/_/  _/        _/  _/    _/  _/  _/    _/     
+_/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/      
+                                 _/                           
+                                _/
+
+small tool to convert images into ascii art
+        ")
         .arg(
             arg!(-i --input <VALUE>)
                 .help("image to convert")
