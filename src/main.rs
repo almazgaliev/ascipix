@@ -18,7 +18,7 @@ fn main() {
         .arg(
             arg!(-s --size)
                 .id("size")
-                .help("sets window size")
+                .help("sets image size")
                 .conflicts_with("scale")
                 .number_of_values(2)
                 .require_value_delimiter(true)
@@ -80,7 +80,7 @@ fn main() {
             None => vec![image.width(), image.height()],
         },
     };
-    let image = image.resize_exact(size[0] / scale.0, size[1] / scale.1, FilterType::Triangle);
+    let image = image.resize_exact(size[0] / scale.0, size[1] / scale.1, FilterType::Nearest);
 
     output(image.into_rgb32f(), grayscale);
 }
