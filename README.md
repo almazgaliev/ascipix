@@ -1,9 +1,7 @@
-# ASCIPIX
+
 <!-- Lean font from https://www.coolgenerator.com/ascii-text-generator -->
 ![](./ascipix.png)
 
-small and ~~fast~~ **Blazingly fast!!!!!!** tool to convert images into ascii art
-written in Rust 🦀
 
 # Build
 ```
