@@ -5,7 +5,7 @@
 
 # Build
 ```
-git clone https://github.com/almazgaliev99/ascipix
+git clone https://github.com/almazgaliev/ascipix
 cd ascipix
 cargo build --release
 ```
