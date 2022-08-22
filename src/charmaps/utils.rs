@@ -12,11 +12,16 @@ where
     P: Pixel<Subpixel = T>,
     C: Deref<Target = [T]>,
 {
+    let mut height = height;
+    let mut width = width;
     if x + width > image.width() {
-        None
-    } else if y + height > image.height() {
-        None
-    } else if width == 0 || height == 0 {
+        width = image.width().saturating_sub(x);
+    } 
+    if y + height > image.height() {
+        height = image.height().saturating_sub(y);
+    }
+
+    if width == 0 || height == 0 {
         None
     } else {
         Some(image.view(x, y, width, height))
