@@ -1,25 +1,31 @@
+mod charify;
+mod charmaps;
+mod rgb_color_map;
+use crate::charmaps::{BrailleCharMap, GrayCharMap};
+use charify::Charify;
 use clap::{arg, ArgAction, Command};
-use image::{ImageBuffer, Rgb,imageops::FilterType};
+use image::{imageops::FilterType, Luma};
 use std::path::Path;
 
 fn main() {
-    // TODO add cli argument for scale
-    let scale: (u32, u32) = (1, 2); // one character width height ratio in terminal
+    // TODO add declarative argparser
     let matches = Command::new("ascipix")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Galiev A. <almazgaliev99@gmail.com>")
-        .about(r"
-                                                              
-      _/_/                        _/            _/            
-   _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/   
-  _/_/_/_/  _/_/      _/        _/  _/    _/  _/    _/_/      
- _/    _/      _/_/  _/        _/  _/    _/  _/  _/    _/     
-_/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/      
-                                 _/                           
+        .about(
+            r"
+
+      _/_/                        _/            _/
+   _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/
+  _/_/_/_/  _/_/      _/        _/  _/    _/  _/    _/_/
+ _/    _/      _/_/  _/        _/  _/    _/  _/  _/    _/
+_/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/
+                                 _/
                                 _/
 
 small tool to convert images into ascii art
-        ")
+        ",
+        )
         .arg(
             arg!(-i --input <VALUE>)
                 .help("image to convert")
@@ -27,7 +33,7 @@ small tool to convert images into ascii art
                 .required(true),
         )
         .arg(
-            arg!(-s --size)
+            arg!(-s --size <VALUE>)
                 .id("size")
                 .help("sets image size")
                 .conflicts_with("scale")
@@ -49,7 +55,14 @@ small tool to convert images into ascii art
                 .help("invert colors")
                 .id("invert")
                 .required(false)
-                .action(ArgAction::SetFalse),
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
+            arg!(--dither)
+                .help("use dithered image")
+                .id("dither")
+                .required(false)
+                .action(ArgAction::SetTrue),
         )
         .arg(
             arg!(-g --grayscale <VALUE>)
@@ -61,22 +74,15 @@ small tool to convert images into ascii art
         )
         .get_matches();
 
-    let grayscale = {
-        let index = *matches.get_one::<usize>("grayscale_index").unwrap();
-        let invert = *matches.get_one("invert").unwrap();
-
-        let grayscales = ["WHyzv;\"` ", "NWyx?!`. ", "@%#*+=-:. ", "@$#*!=;:~-,. "];
-        let mut grayscale: Vec<char> = grayscales[index].chars().collect();
-        if invert {
-            grayscale.reverse();
-        }
-        grayscale
-    };
-
+    let invert: bool = *matches.get_one("invert").unwrap();
     let image = {
         let path = matches.get_one::<String>("input_image").unwrap();
         let image_path = Path::new(path);
-        image::open(image_path).unwrap()
+        let mut image = image::open(image_path).unwrap();
+        if invert {
+            image.invert();
+        }
+        image
     };
 
     let size: Vec<u32> = match matches.get_many("size") {
@@ -91,24 +97,21 @@ small tool to convert images into ascii art
             None => vec![image.width(), image.height()],
         },
     };
-    let image = image.resize_exact(size[0] / scale.0, size[1] / scale.1, FilterType::Nearest);
 
-    output(image.into_rgb32f(), grayscale);
-}
+    let image = image
+        .resize_exact(size[0], size[1], FilterType::Nearest)
+        .into_luma8();
 
-/// prints image into stdout using grayscale characters
-fn output(buffer: ImageBuffer<Rgb<f32>, Vec<f32>>, grayscale: Vec<char>) {
-    let max_index = (grayscale.len() - 1) as f32;
-    for (x, y, &pix) in buffer.enumerate_pixels() {
-        if x == 0 && y != 0 {
-            println!("");
+    let dither: bool = *matches.get_one("dither").unwrap();
+
+    let grayscale: Box<dyn Charify<Luma<u8>, u8, Vec<u8>>> = {
+        if dither {
+            Box::new(BrailleCharMap)
+        } else {
+            let index = *matches.get_one::<usize>("grayscale_index").unwrap();
+            Box::new(GrayCharMap::existing(index))
         }
-        let brightness = (pix[0] + pix[1] + pix[2]) / 3.0;
-        let index = (brightness * max_index) as usize;
-        let b = grayscale
-            .get(index)
-            .unwrap();
-        print!("{}", b);
-    }
-    println!("");
+    };
+    let res = grayscale.charify(&image);
+    println!("{}", res);
 }

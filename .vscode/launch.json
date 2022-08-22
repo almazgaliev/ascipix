@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-i", "./cat.jpg"],
+            "args": ["-i", "./cat.jpg", "--size" , "40x40", "--dither"],
             "cwd": "${workspaceFolder}"
         },
         {
