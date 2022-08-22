@@ -1,14 +1,19 @@
+mod charify;
 use clap::{arg, ArgAction, Command};
-use image::{ImageBuffer, Rgb,imageops::FilterType};
+use image::{ImageBuffer, Rgb};
 use std::path::Path;
 
 fn main() {
-    // TODO add cli argument for scale
+    // TODO change pixel indexing method
+    // TODO add next
+    // https://www.reddit.com/r/neovim/comments/wq48r4/introducing_imagenvim_image_viewer_as_ascii_art/
+    // TODO add declarative argparser
     let scale: (u32, u32) = (1, 2); // one character width height ratio in terminal
     let matches = Command::new("ascipix")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Galiev A. <almazgaliev99@gmail.com>")
-        .about(r"
+        .about(
+            r"
                                                               
       _/_/                        _/            _/            
    _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/   
@@ -19,7 +24,8 @@ _/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/
                                 _/
 
 small tool to convert images into ascii art
-        ")
+        ",
+        )
         .arg(
             arg!(-i --input <VALUE>)
                 .help("image to convert")
@@ -27,7 +33,7 @@ small tool to convert images into ascii art
                 .required(true),
         )
         .arg(
-            arg!(-s --size)
+            arg!(-s --size <VALUE>)
                 .id("size")
                 .help("sets image size")
                 .conflicts_with("scale")
@@ -91,9 +97,10 @@ small tool to convert images into ascii art
             None => vec![image.width(), image.height()],
         },
     };
-    let image = image.resize_exact(size[0] / scale.0, size[1] / scale.1, FilterType::Nearest);
+    // FIX change to iterations 
+    // let image = image.resize_exact(size[0] / scale.0, size[1] / scale.1, FilterType::Nearest);
 
-    output(image.into_rgb32f(), grayscale);
+    // output(image.into_rgb32f(), grayscale);
 }
 
 /// prints image into stdout using grayscale characters
