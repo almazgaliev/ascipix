@@ -17,7 +17,21 @@ cargo build --release
 
 # usage help
 ```
-./ascipix -h
+$> ./ascipix -h
+
+USAGE:
+    ascipix [OPTIONS] --input <VALUE> --size <VALUE>x<VALUE>
+
+OPTIONS:
+        --dither                  use dithering algorithm
+    -g, --grayscale <VALUE>       string of character to use in art [default: 0]
+    -h, --help                    Print help information
+    -i, --input <VALUE>           image to convert
+        --invert                  invert colors
+    -s, --size <VALUE>x<VALUE>    sets image size
+        --scale <NTIMES>          scale original image in percents [default: 100]
+    -V, --version                 Print version information
+
 ```
 # usage examples
 ![](./cat.jpg)
