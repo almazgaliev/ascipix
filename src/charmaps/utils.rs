@@ -1,7 +1,8 @@
 use ::std::ops::Deref;
 use image::{GenericImageView, ImageBuffer, Pixel, SubImage};
 
-pub fn get_view<P, T, C>(
+/// gets croped valid subimage or `None` also read [`image::GenericImageView::view`]
+pub fn get_view_checked<P, T, C>(
     image: &ImageBuffer<P, C>,
     x: u32,
     y: u32,

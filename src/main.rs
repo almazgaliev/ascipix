@@ -1,8 +1,10 @@
 mod charify;
 mod charmaps;
+
+mod dither;
 mod rgb_color_map;
+use crate::charify::Charify;
 use crate::charmaps::{BrailleCharMap, GrayCharMap};
-use charify::Charify;
 use clap::{arg, ArgAction, Command};
 use image::{imageops::FilterType, Luma};
 use std::path::Path;
@@ -15,13 +17,13 @@ fn main() {
         .about(
             r"
 
-      _/_/                        _/            _/
-   _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/
-  _/_/_/_/  _/_/      _/        _/  _/    _/  _/    _/_/
- _/    _/      _/_/  _/        _/  _/    _/  _/  _/    _/
-_/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/
-                                 _/
-                                _/
+        _/_/                        _/            _/           
+     _/    _/    _/_/_/    _/_/_/      _/_/_/        _/    _/  
+    _/_/_/_/  _/_/      _/        _/  _/    _/  _/    _/_/     
+   _/    _/      _/_/  _/        _/  _/    _/  _/  _/    _/    
+  _/    _/  _/_/_/      _/_/_/  _/  _/_/_/    _/  _/    _/     
+                                   _/                          
+                                  _/                           
 
 small tool to convert images into ascii art
         ",
@@ -106,10 +108,10 @@ small tool to convert images into ascii art
 
     let grayscale: Box<dyn Charify<Luma<u8>, u8, Vec<u8>>> = {
         if dither {
-            Box::new(BrailleCharMap)
+            Box::new(BrailleCharMap::default())
         } else {
             let index = *matches.get_one::<usize>("grayscale_index").unwrap();
-            Box::new(GrayCharMap::existing(index))
+            Box::new(GrayCharMap::from_existing(index))
         }
     };
     let res = grayscale.charify(&image);
