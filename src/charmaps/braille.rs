@@ -1,7 +1,7 @@
 use crate::charify::Charify;
 use crate::dither::{Dither, FloydSteinberg};
 use image::imageops::colorops::BiLevel;
-use image::{GenericImageView, ImageBuffer, Luma, Pixel};
+use image::{GenericImageView, ImageBuffer, Luma};
 
 use super::utils::view_checked;
 
@@ -71,10 +71,10 @@ fn to_braille(pixels: impl Iterator<Item = (u32, u32, u32)>) -> char {
 fn bit_shift(coords: (u32, u32)) -> u32 {
     match coords {
         (0, 0) => 0,
-        (0, 1) => 1,
-        (1, 0) => 2,
-        (1, 1) => 3,
-        (2, 0) => 4,
+        (0, 1) => 3,
+        (1, 0) => 1,
+        (1, 1) => 4,
+        (2, 0) => 2,
         (2, 1) => 5,
         (3, 0) => 6,
         (3, 1) => 7,
